@@ -2,7 +2,7 @@
 
 ## Introduction
 
-As humans, we are hardwired to look for patterns and identify relationships between things we observe in the world around us. Our brains naturally tend to fill in details and come up with explanations for these relationships. Unfortunately, jumping to conclusions often leads us to see nonrandom in the random and to blur the lines between association and causation.
+As humans, we are hardwired to look for patterns and identify relationships between things we observe in the world around us. Our brains naturally tend to fill in details and come up with explanations for these relationships. Unfortunately, jumping to conclusions often leads us to see non-random in the random and to blur the lines between association and causation.
 
 Before we get some hands-on experience using causal inference methods, we need to build up some intuition about what exactly causal inference is, when causal inference is appropriate to use, and what causal inference can (and cannot) do. In this lesson, we will gradually introduce you to the key ideas, statistical frameworks, and required assumptions that are fundamental to causal inference.
 
@@ -144,9 +144,6 @@ In our table, we have the data for our twelve hospital patients who chose whethe
 If we compute the estimated ATE as though treatment was randomized and don’t take anxiety (X) into account, we get an estimated ATE of -2.9. We conclude that therapy animal services reduce cortisol levels by 2.9 units on average.
 
 ![](media/b1e9b145bcd068df73f43b41ebdb17fe.png)![](media/a2fa6cc2584dc82b7db4ca16f52e344b.png)
-
-**  
-**
 
 **Estimated ATE for X=1**
 
@@ -291,24 +288,26 @@ So how is “good” or “bad” balance defined?
 
 Suppose we are interested in determining whether the practice of meditation increases the amount of sleep that university students get per night. To gather more information, we surveyed 250 students about their sleeping and meditation habits over the previous year. Note that students were not randomly assigned to treatment groups; students were simply asked about their actions. Their responses were recorded in a dataset with these variables:
 
--   sleep — average hours of sleep per night (outcome variable)
--   meditate — indicates whether or not the individual reports consistent use of meditation (treatment group variable)
--   stress — a self-reported measure of stress on a 1-to-100 scale, with 1 representing no stress and 100 representing extremely high stress
--   graduate — indicates whether or not a student is in a graduate program versus an undergraduate program (0 = undergraduate; 1 = graduate).
+-   `sleep` — average hours of sleep per night (outcome variable)
+-   `meditate` — indicates whether or not the individual reports consistent use of meditation (treatment group variable)
+-   `stress` — a self-reported measure of stress on a 1-to-100 scale, with 1 representing no stress and 100 representing extremely high stress
+-   `graduate` — indicates whether or not a student is in a graduate program versus an undergraduate program (0 = undergraduate; 1 = graduate).
 
-We can use the bal.plot() function from the R package, cobalt, to visually check if any variables are severely imbalanced and whether propensity score methods might be useful. The function takes a formula where the left side specifies the treatment group indicator and the right side includes a variable we want to view. To check the stress variable, the formula would be meditate \~ stress. Then we specify the dataset name and the variable of interest in quotes as additional arguments.
+We can use the `bal.plot()` function from the R package, cobalt, to visually check if any variables are severely imbalanced and whether propensity score methods might be useful. The function takes a formula where the left side specifies the treatment group indicator and the right side includes a variable we want to view. To check the `stress` variable, the formula would be `meditate ~ stress`. Then we specify the dataset name and the variable of interest in quotes as additional arguments.
 
-\# import library  
-library(cobalt)  
-\# plot distributions for stress variable  
-bal.plot(  
- x = meditate \~ stress, \#formula  
- data = sleep_data, \#dataset  
- var.name = "stress" \#variable  
- colors = c("\#E69F00", "\#009E73") \#set fill colors  
+```
+# import library
+library(cobalt)
+# plot distributions for stress variable
+bal.plot(
+  x = meditate ~ stress, #formula
+  data = sleep_data, #dataset
+  var.name = "stress" #variable
+  colors = c("#E69F00", "#009E73") #set fill colors
 )
+```
 
-Note that we also set the optional argument colors to c("\#E69F00", "\#009E73") for better contrast.
+Note that we also set the optional argument `colors` to c("\#E69F00", "\#009E73") for better contrast.
 
 ![](media/86f969441d44256a8bed7079867e9cc5.png)
 
@@ -316,23 +315,25 @@ The distributions in the plot appear to differ pretty substantially between the 
 
 ## Visual Check of Categorical Variables
 
-Distribution plots are great for numeric variables, but we need a different type of plot for categorical variables. Fortunately, we can use the exact same bal.plot() function from cobalt with no need to specify the variable type. By updating the arguments for x and var.name to use graduate, we will get a bar plot to examine balance for the categorical variable graduate.
+Distribution plots are great for numeric variables, but we need a different type of plot for categorical variables. Fortunately, we can use the exact same `bal.plot()` function from cobalt with no need to specify the variable type. By updating the arguments for `x` and `var.name` to use `graduate`, we will get a bar plot to examine balance for the categorical variable `graduate`.
 
-\# import library  
-library(cobalt)  
-\# plot distributions for stress variable  
-bal.plot(  
- x = meditate \~ graduate, \#new formula  
- data = sleep_data, \#dataset  
- var.name = "graduate", \#new variable  
- colors = c("\#E69F00", "\#009E73") \#set fill colors  
+```
+# import library
+library(cobalt)
+# plot distributions for stress variable
+bal.plot(
+  x = meditate ~ graduate, #new formula
+  data = sleep_data, #dataset
+  var.name = "graduate", #new variable
+  colors = c("#E69F00", "#009E73") #set fill colors
 )
+```
 
 ![](media/ad4a56663400663937e694ee9040c94c.png)
 
 From this plot, we see that the ratio of undergraduates to graduates is much larger for the meditation group (green) than for the non-meditation group (orange).
 
-Both plots so far suggest that there are differences between the treatment and control groups with respect to the stress and graduate variables. However, balance plots don’t precisely quantify the degree of imbalance in the dataset. To get a more detailed picture, we can check balance numerically.
+Both plots so far suggest that there are differences between the treatment and control groups with respect to the `stress` and `graduate` variables. However, balance plots don’t precisely quantify the degree of imbalance in the dataset. To get a more detailed picture, we can check balance numerically.
 
 ## Checking Balance Numerically
 
@@ -343,30 +344,34 @@ Observing an SMD of exactly zero or a variance ratio of exactly one is pretty un
 -   SMD between -0.1 and 0.1
 -   Variance ratio between 0.5 and 2.0
 
-The bal.tab() function from the cobalt package is a complement to the bal.plot() function that quantifies the balance of variables in a dataset. The bal.tab() function has similar arguments and syntax to the bal.plot() function. We need to update our formula to include both variables of interest. Then we can show SMDs for all variables and variance ratios for all continuous variables in the sleep dataset by specifying binary = "std" and disp.v.ratio = TRUE, respectively:
+The `bal.tab()` function from the cobalt package is a complement to the `bal.plot()` function that quantifies the balance of variables in a dataset. The `bal.tab()` function has similar arguments and syntax to the `bal.plot()` function. We need to update our formula to include both variables of interest. Then we can show SMDs for all variables and variance ratios for all continuous variables in the sleep dataset by specifying `binary = "std"` and `disp.v.ratio = TRUE`, respectively:
 
-\# import library  
-library(cobalt)  
-\# print table of SMDs and variance ratios  
-bal.tab(  
- x = meditate \~ stress + graduate, \#formula  
- data = sleep_data, \#dataset  
- disp.v.ratio = TRUE, \#display variance ratio  
- binary = "std" \#SMDs for binary variables  
+```
+# import library
+library(cobalt)
+# print table of SMDs and variance ratios
+bal.tab(
+  x = meditate ~ stress + graduate, #formula
+  data = sleep_data, #dataset
+  disp.v.ratio = TRUE, #display variance ratio
+  binary = "std" #SMDs for binary variables
 )
+```
 
-The output of the bal.tab() that follows shows that the stress variable has an SMD of -0.9132 and a variance ratio of 0.5461 between the treatment and control groups. The graduate variable has an SMD of -0.6548.
+The output of the `bal.tab()` that follows shows that the `stress` variable has an SMD of -0.9132 and a variance ratio of 0.5461 between the treatment and control groups. The `graduate` variable has an SMD of -0.6548.
 
-Balance Measures  
- Type Diff.Un V.Ratio.Un  
-stress Contin. -0.9132 0.5461  
-graduate Binary -0.6548  
-   
-Sample Sizes  
- Control Treated  
-All 190 60
+```
+Balance Measures
+            Type    Diff.Un   V.Ratio.Un
+stress    Contin.   -0.9132       0.5461
+graduate  Binary    -0.6548
+ 
+Sample Sizes
+        Control Treated
+All        190      60
+```
 
-The SMDs clearly fall outside the range of -0.1 to 0.1, which suggests there is an imbalance between the treatment and control groups. The variance ratio for the stress variable is only just within the acceptable range. Time to put propensity score methods to the test to see if we can reduce this imbalance!
+The SMDs clearly fall outside the range of -0.1 to 0.1, which suggests there is an imbalance between the treatment and control groups. The variance ratio for the `stress` variable is only just within the acceptable range. Time to put propensity score methods to the test to see if we can reduce this imbalance!
 
 ## Modelling Propensity Scores
 
@@ -374,21 +379,23 @@ Returning to our student sleep data, we are interested in the effect of meditati
 
 Propensity scores reflect the probability of being in the treatment group, as opposed to the control group, given a set of characteristics. Because this probability corresponds to a binary outcome—either being in the treatment group or the control group—we can model the propensity scores using logistic regression. The outcome of the regression will predict whether or not an individual is in the treatment group. It will use potential confounding variables as predictors.
 
-With regards to our sleep data, the propensity score should model the probability of practicing meditation based on the other characteristics in the data. Let’s start with a propensity score model with the meditate variable as the outcome and the stress variable as a predictor.
+With regards to our sleep data, the propensity score should model the probability of practicing meditation based on the other characteristics in the data. Let’s start with a propensity score model with the `meditate` variable as the outcome and the `stress` variable as a predictor.
 
-The glm() function in R makes modeling propensity scores via logistic regression simple. By default, the glm() function fits a linear regression model, so we need to modify the family argument to specify that the treatment group variable is binary. To do this, we set the family argument to "binomial":
+The `glm()` function in R makes modeling propensity scores via logistic regression simple. By default, the `glm()` function fits a linear regression model, so we need to modify the `family` argument to specify that the treatment group variable is binary. To do this, we set the `family` argument to `"binomial"`:
 
-prop_model \<- glm(  
- formula = meditate \~ stress, \#formula  
- data = sleep_data, \#dataset  
- family = "binomial" \#specify logistic regression  
+```
+prop_model <- glm(
+  formula = meditate ~ stress, #formula
+  data = sleep_data, #dataset
+  family = "binomial" #specify logistic regression
 )
+```
 
-To get a sense of what the propensity scores produced from a logistic regression look like, let’s take a look at a histogram of the propensity scores from prop_model.
+To get a sense of what the propensity scores produced from a logistic regression look like, let’s take a look at a histogram of the propensity scores from `prop_model`.
 
 ![](media/b08505c211a64f1d023db511be0a7843.png)
 
-The plot indicates that our model produced a lot of low probabilities of being treated for our observations. This makes sense given that the bal.tab() output in the last exercise showed us we had 190 students in the non-meditation group and only 60 in the meditation group.
+The plot indicates that our model produced a lot of low probabilities of being treated for our observations. This makes sense given that the `bal.tab()` output in the last exercise showed us we had 190 students in the non-meditation group and only 60 in the meditation group.
 
 ## Propensity Score Weighting
 
@@ -400,7 +407,7 @@ Propensity score weighting transforms estimated propensity scores into *weights*
 
 IPTW weights are calculated differently depending on whether we want to estimate the average treatment effect (ATE) or the average treatment effect on the treated (ATT). Note that with ATE we are looking at the effect across the entire population, both the treated and control groups. ATT is just on the treated group.
 
-The formulas for the treatment and control group weights for each estimand are below. p represents the propensity score for a particular individual.
+The formulas for the treatment and control group weights for each estimand are below. `p` represents the propensity score for a particular individual.
 
 |                  | ATE         | ATT         |
 |------------------|-------------|-------------|
@@ -435,57 +442,61 @@ The justification for this method is that someone who looks more like the indivi
 
 If this seems like a lot of work, don’t worry! The WeightIt package in R has functions to model the propensity scores and simultaneously perform propensity score weighting. We don’t need to make a separate logistic regression or compute the weights manually using a formula.
 
-IPTW can be performed in R with the weightit() function from the WeightIt package. There are several key arguments to this function that allow us to tweak how weighting is performed.
+IPTW can be performed in R with the `weightit()` function from the `WeightIt` package. There are several key arguments to this function that allow us to tweak how weighting is performed.
 
--   formula—represents the propensity score model to use.
--   method—determines the weighting method that will be used. While there are various options, we will use “ps” to perform IPTW using logistic regression.
--   estimand—specifies the desired treatment effect estimand: “ATE” for average treatment effect, “ATC” for average treatment effect on the controls, or “ATT” for average treatment effect on the treated.
+-   `formula`—represents the propensity score model to use.
+-   `method`—determines the weighting method that will be used. While there are various options, we will use “ps” to perform IPTW using logistic regression.
+-   `estimand`—specifies the desired treatment effect estimand: “ATE” for average treatment effect, “ATC” for average treatment effect on the controls, or “ATT” for average treatment effect on the treated.
 
-To perform IPTW for the ATT on the student sleep data, we fill in these arguments accordingly. Remember that our propensity score model includes meditate as the outcome and only stress as the predictor.
+To perform IPTW for the ATT on the student sleep data, we fill in these arguments accordingly. Remember that our propensity score model includes `meditate` as the outcome and only `stress` as the predictor.
 
-\# import library  
-library(WeightIt)  
-\# model propensity scores and IPTW weights  
-iptw_sleep \<- weightit(  
- formula = meditate \~ stress, \#propensity model  
- data = sleep_data, \#dataset  
- method = "ps", \#use IPTW  
- estimand = "ATT" \#estimand  
+```
+# import library
+library(WeightIt)
+# model propensity scores and IPTW weights
+iptw_sleep <- weightit(
+  formula = meditate ~ stress, #propensity model
+  data = sleep_data, #dataset
+  method = "ps", #use IPTW
+  estimand = "ATT" #estimand
 )
+```
 
-The weightit() function models the propensity scores and creates the IPTW weights in one step. We save these outputs in a weightit object we name iptw_sleep, which we will use in our next step.
+The `weightit()` function models the propensity scores and creates the IPTW weights in one step. We save these outputs in a `weightit` object we name `iptw_sleep`, which we will use in our next step.
 
 ## Re-Checking Overlap and Balance
 
 If propensity score weighting is successful, we expect the distribution of propensity scores in the treatment group to be similar to that of the control group.
 
-To check the overall balance of propensity scores, we can again use the bal.plot() function from the cobalt package. This time we pass the weightit object to the x argument and "prop.score" to the var.name argument, with no need for the data argument. Lastly, we set which equal to both so we can view the propensity scores before (“unadjusted”) and after (“adjusted”) weighting is performed.
+To check the overall balance of propensity scores, we can again use the `bal.plot()` function from the cobalt package. This time we pass the `weightit` object to the `x` argument and `"prop.score"` to the `var.name` argument, with no need for the `data` argument. Lastly, we set `which` equal to `both` so we can view the propensity scores before (“unadjusted”) and after (“adjusted”) weighting is performed.
 
-\# import library  
-library(cobalt)  
-   
-\# create balance plot of propensity scores  
-bal.plot(  
- x = iptw_sleep, \#weightit object  
- var.name = "prop.score", \#propensity scores  
- which = "both", \#before and after  
- colors = c("\#E69F00", "\#009E73") \#sets fill colors  
+```
+# import library
+library(cobalt)
+ 
+# create balance plot of propensity scores
+bal.plot(
+  x = iptw_sleep, #weightit object
+  var.name = "prop.score", #propensity scores
+  which = "both", #before and after
+  colors = c("#E69F00", "#009E73") #sets fill colors
 )
+```
 
 ![](media/dbae3dc53b822ddbfbcca4a1891128e2.png)
 
-The distributions of propensity scores look similar after IPTW, but we should check the balance of individual variables, too. The love.plot() function in cobalt visually checks the standard mean differences (SMD) between treatment groups for all variables before and after weighting. We can also show guidelines at ±0.1 SMD by setting thresholds = c(m = 0.1).
+The distributions of propensity scores look similar after IPTW, but we should check the balance of individual variables, too. The `love.plot()` function in cobalt visually checks the standard mean differences (SMD) between treatment groups for all variables before and after weighting. We can also show guidelines at ±0.1 SMD by setting `thresholds = c(m = 0.1)`.
 
-love.plot(  
- x = iptw_sleep, \#weightit object  
- binary = "std", \#use SMD  
- thresholds = c(m = 0.1), \#guidelines  
- colors = c("\#E69F00", "\#009E73") \#sets fill colors  
-)
+`love.plot(
+  x = iptw_sleep, #weightit object
+  binary = "std", #use SMD
+  thresholds = c(m = 0.1), #guidelines
+  colors = c("#E69F00", "#009E73") #sets fill colors
+)`
 
 ![](media/6df3edadf1ab20ac5e21c4a81e64ac1c.png)
 
-Oh no! Based on this plot, it appears as if the propensity score weighting was unsuccessful: the SMDs between groups are outside the ±0.1 cutoffs for the stress variable and for the propensity scores themselves. Since there is still some residual imbalance between treatment groups, we should backtrack to step 2 and refine the propensity score model.
+Oh no! Based on this plot, it appears as if the propensity score weighting was unsuccessful: the SMDs between groups are outside the ±0.1 cutoffs for the `stress` variable and for the propensity scores themselves. Since there is still some residual imbalance between treatment groups, we should backtrack to step 2 and refine the propensity score model.
 
 ## Refining the Propensity Score Model
 
@@ -493,30 +504,34 @@ As you may have noticed, propensity score methods are an iterative process: we c
 
 Let’s update our propensity score model from the student sleep data to see if imbalances between groups can be reduced further.
 
-The initial propensity score model only included the stress variable as a predictor of meditation, but what happens if we add the graduate variable as a second predictor? We need to update the formula in the weightit() function:
+The initial propensity score model only included the `stress` variable as a predictor of meditation, but what happens if we add the `graduate` variable as a second predictor? We need to update the formula in the `weightit()` function:
 
-\# import library  
-library(WeightIt)  
-\# update weightit object  
-iptw_sleep_update \<- weightit(  
- \#new formula  
- formula = meditate \~ stress + graduate,  
- data = sleep_data,  
- estimand = "ATT",  
- method = "ps"  
+```
+# import library
+library(WeightIt)
+# update weightit object
+iptw_sleep_update <- weightit(
+  #new formula
+  formula = meditate ~ stress + graduate,
+  data = sleep_data,
+  estimand = "ATT",
+  method = "ps"
 )
+```
 
 We re-check balance again to see if the new propensity score model produces a better balance between groups.
 
-\# import library  
-library(cobalt)  
-\# create Love plot of updated model  
-love.plot(  
- x = iptw_sleep_update, \#updated model,  
- binary = "std", \#show SMD  
- thresholds = c(m = 0.1), \#guidelines  
- colors = c("\#E69F00", "\#009E73") \#fill colors  
+```
+# import library
+library(cobalt)
+# create Love plot of updated model
+love.plot(
+  x = iptw_sleep_update, #updated model,
+  binary = "std", #show SMD
+  thresholds = c(m = 0.1), #guidelines
+  colors = c("#E69F00", "#009E73") #fill colors
 )
+```
 
 ![](media/7afc3b01aa5d74c460fa59195797273a.png)
 
@@ -528,43 +543,49 @@ Note that it can take multiple tries to find a good propensity score model. If w
 
 Now that we have a good balance, we can proceed to the last step of a propensity score analysis: estimating the causal treatment effect.
 
-If we think back to the beginning of our lesson, the motivation for studying student sleep was to estimate the effect of meditation on average sleep in university students. So, to estimate the causal treatment effect of meditation, we need to fit a regression model for the outcome variable (hours of sleep) and incorporate the propensity score weights from our weightit model.
+If we think back to the beginning of our lesson, the motivation for studying student sleep was to estimate the effect of meditation on average sleep in university students. So, to estimate the causal treatment effect of meditation, we need to fit a regression model for the outcome variable (hours of sleep) and incorporate the propensity score weights from our `weightit` model.
 
 The final regression model should include hours of sleep as the outcome variable, use of meditation as the treatment group variable, and stress level and graduate status as the other predictor variables.
 
-To use the propensity score weights from IPTW, we set the weights argument of the glm() function equal to the estimated IPTW weights. These are stored in our updated weightit model that we called iptw_sleep_update.
+To use the propensity score weights from IPTW, we set the `weights` argument of the `glm()` function equal to the estimated IPTW weights. These are stored in our updated `weightit` model that we called `iptw_sleep_update`.
 
-outcome_mod_weight \<- glm(  
- \#outcome model  
- formula = sleep \~ meditate + stress + graduate,  
- \#dataset   
- data = sleep_data,  
- \#IPTW weights  
- weights = iptw_sleep_update\$weights   
+```
+outcome_mod_weight <- glm(
+  #outcome model
+  formula = sleep ~ meditate + stress + graduate,
+  #dataset 
+  data = sleep_data,
+  #IPTW weights
+  weights = iptw_sleep_update$weights 
 )
+```
 
-To get the estimated treatment effect, we use the coeftest() function from the lmtest package. Weighting can cause our standard errors to be inaccurate. To get the best estimate of the treatment effect, we need a more *robust* calculation of the standard errors, so we add the argument vcov. = vcovHC made available by the sandwich package. We won’t cover this in detail here, but this adjustment means we are using a *heteroscedasticity-consistent estimation of the covariance matrix* for estimates of the coefficients.
+To get the estimated treatment effect, we use the `coeftest()` function from the lmtest package. Weighting can cause our standard errors to be inaccurate. To get the best estimate of the treatment effect, we need a more *robust* calculation of the standard errors, so we add the argument `vcov. = vcovHC` made available by the sandwich package. We won’t cover this in detail here, but this adjustment means we are using a *heteroscedasticity-consistent estimation of the covariance matrix* for estimates of the coefficients.
 
-\# import library  
-library(lmtest)  
-library(sandwich)  
-\# perform tests of regression coefficients  
-coeftest(  
- outcome_mod_weight, \#weighted outcome model  
- vcov. = vcovHC \#robust standard errors  
+```
+# import library
+library(lmtest)
+library(sandwich)
+# perform tests of regression coefficients
+coeftest(
+  outcome_mod_weight, #weighted outcome model
+  vcov. = vcovHC #robust standard errors
 )
+```
 
 As we can see in the following output, the coefficient for the meditation variable is 1.02. If we have met the assumptions of IPTW, this means that we can conclude that a typical student who practiced meditation got an additional 1.02 hours of sleep because of meditation.
 
-z test of coefficients:  
-   
- Estimate Std. Error z value Pr(\>\|z\|)  
-(Intercept) 8.971964 0.669241 13.4062 \< 2.2e-16 \*\*\*  
-meditate 1.024871 0.215333 4.7595 1.941e-06 \*\*\*  
-stress -0.045191 0.013664 -3.3072 0.0009422 \*\*\*  
-graduate -0.770913 0.280460 -2.7487 0.0059823 \*\*  
-\---  
-Signif. codes: 0 '\*\*\*' 0.001 '\*\*' 0.01 '\*' 0.05 '.' 0.1 '' 1
+```
+z test of coefficients:
+ 
+              Estimate  Std. Error  z value   Pr(>|z|)
+(Intercept)   8.971964    0.669241  13.4062  < 2.2e-16 ***
+meditate      1.024871    0.215333   4.7595  1.941e-06 ***
+stress       -0.045191    0.013664  -3.3072  0.0009422 ***
+graduate     -0.770913    0.280460  -2.7487  0.0059823 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 '' 1
+```
 
 ## Conclusion
 
@@ -575,7 +596,7 @@ In this lesson, you learned:
 -   There are five stages of using propensity scores in causal inference.
 -   A propensity score is computed by predicting the probability of treatment from the other observed variables.
 -   We use propensity scores in Inverse Probability of Treatment Weighting (IPTW) to create balance across observed variables.
--   We can check balance between treatment and control groups across variables using the cobalt package functions bal.tab(), bal.plot(), and love.plot().
+-   We can check balance between treatment and control groups across variables using the cobalt package functions `bal.tab()`, `bal.plot()`, and `love.plot()`.
 -   A poor propensity score model may lead to biased estimates of the treatment effect, so it is very important that we find the best model possible.
 -   We get an estimate of the treatment effect by creating a regression model with IPTW weights.
 
@@ -589,9 +610,9 @@ Research suggests that individuals put more into retirement accounts or pension 
 
 Imagine that a country’s legislature passes a law that requires employers with more than 300 employees to provide a retirement contribution matching program. Using tax data, lawmakers compile a dataset with the following information from each of 200 different companies:
 
--   size: Number of employees
--   group: Contribution Matching Program Group (“No Program” vs. “Program”)
--   contribution: Average monthly employee contributions (in dollars)
+-   `size`: Number of employees
+-   `group`: Contribution Matching Program Group (“No Program” vs. “Program”)
+-   `contribution`: Average monthly employee contributions (in dollars)
 
 Number of employees — acting as the forcing variable with a cutoff at 300 employees — dictates whether or not a company has a contribution matching program.
 
@@ -656,36 +677,38 @@ For example:
 
 A scatter plot of our data allows us to check certain RDD conditions visually. We can see whether we have a sharp or fuzzy cutoff. We can also use the plot to check for a *discontinuity* — a sudden change in the outcome variable — at the cutoff.
 
-To create this scatter plot with the contribution matching dataset, we can use the ggplot2 package in R:
+To create this scatter plot with the contribution matching dataset, we can use the `ggplot2` package in R:
 
-library(ggplot2) \#load ggplot2 package
+`library(ggplot2) #load ggplot2 package
+`
 
 Our scatter plot should have the number of employees on the x-axis and the contribution amount on the y-axis. The points for treatment and control groups should be different colors and shapes, so we can easily tell the two groups apart. Finally, we add code for a dashed vertical line at the cutoff of 300 employees.
 
-\# create a scatterplot with treatment groups  
-ggplot(  
- data = cont_data,  
- aes(  
- x = size, \# forcing variable  
- y = contribution, \# outcome variable  
- color = group, \# sets point color by treatment group  
- shape = group \# sets point shape by treatment group  
- )) +  
- geom_point() +   
- geom_vline(xintercept = 300, linetype = "dashed") \#add line at 300
+`# create a scatterplot with treatment groups
+ggplot(
+  data = cont_data,
+  aes(
+    x = size, # forcing variable
+    y = contribution, # outcome variable
+    color = group, # sets point color by treatment group
+    shape = group # sets point shape by treatment group
+  )) +
+  geom_point() + 
+  geom_vline(xintercept = 300, linetype = "dashed") #add line at 300
+`
 
 This plot clearly shows that we have a sharp RDD, not a fuzzy one. The dashed line at 300 employees separates the two groups into companies that offer a matching program (at least 300) and companies that do NOT offer a matching program (fewer than 300).
 
 ![](media/f37022fc7a3bc0789bc68ce2f2929a59.png)
 
-We can also check to make sure that there is actually a discontinuity in average contributions based on whether or not companies have more than 300 employees. To do this, we can add a separate best fit line for each treatment group using the geom_smooth() function. If we had saved our first plot as rdd_scatter, we can add the code for the lines as follows:
+We can also check to make sure that there is actually a discontinuity in average contributions based on whether or not companies have more than 300 employees. To do this, we can add a separate best fit line for each treatment group using the `geom_smooth()` function. If we had saved our first plot as `rdd_scatter`, we can add the code for the lines as follows:
 
-\# add best fit lines for each group to scatter plot  
-rdd_scatter +  
- geom_smooth(  
- aes(group = group), \#plot separate lines for each group  
- method = "lm" \#use linear regression  
-)
+`# add best fit lines for each group to scatter plot
+rdd_scatter +
+  geom_smooth(
+    aes(group = group), #plot separate lines for each group
+    method = "lm" #use linear regression
+)`
 
 There is an obvious jump in the average contributions at the cutoff point, which means there is a discontinuity present. If there were no discontinuity present, we might see something like the right image. Note that there is no jump in the outcome variable here. The lines connect smoothly.
 
@@ -702,33 +725,33 @@ The *bandwidth* describes the distance on either side of the cutoff we should us
 
 We could select the bandwidth based on what we BELIEVE is best. However, an algorithm that optimizes the bandwidth mathematically may be a better choice. A popular choice—which we will use—is the Imbens-Kalyanaraman (IK) algorithm.
 
-The R package rdd contains all of the tools needed to calculate the optimal bandwidth and carry out an RDD analysis. To calculate the IK bandwidth using rdd, we will use the IKbandwidth() function, which requires three arguments:
+The R package `rdd` contains all of the tools needed to calculate the optimal bandwidth and carry out an RDD analysis. To calculate the IK bandwidth using `rdd`, we will use the `IKbandwidth()` function, which requires three arguments:
 
--   X: the forcing variable
--   Y: the outcome variable
--   cutpoint: the cutoff value to use.
+-   `X`: the forcing variable
+-   `Y`: the outcome variable
+-   `cutpoint`: the cutoff value to use.
 
 To calculate the IK bandwidth for the contribution matching dataset, we would use the following code:
 
-library(rdd)  
-   
-\# calculate IK bandwidth  
-cont_ik_bw \<- IKbandwidth(  
- X = cont_data\$size, \# forcing variable  
- Y = cont_data\$contribution, \# outcome variable  
- cutpoint = cont_cutpoint \# cutpoint  
-)  
-   
-\# print the IK bandwidth to the console  
-cont_ik_bw  
-[1] 13.26322
+`library(rdd)
+ 
+# calculate IK bandwidth
+cont_ik_bw <- IKbandwidth(
+  X = cont_data$size, # forcing variable
+  Y = cont_data$contribution, # outcome variable
+  cutpoint = cont_cutpoint # cutpoint
+)
+ 
+# print the IK bandwidth to the console
+cont_ik_bw
+[1] 13.26322`
 
 The reduced dataset used in our RDD analysis will include only the companies that have between 286 and 314 employees (300 ± 13.26). Companies with between 286 and 314 employees are likely to be similar on other variables that may impact employee contributions, such as average salary or insurance costs.
 
-To illustrate the bandwidth visually, we can add bandwidth lines to the scatterplot. We can use geom_vline() to add reference lines at the cutpoint ± the bandwidth to our scatter plot rdd_scatter from earlier:
+To illustrate the bandwidth visually, we can add bandwidth lines to the scatterplot. We can use `geom_vline()` to add reference lines at the cutpoint ± the bandwidth to our scatter plot `rdd_scatter` from earlier:
 
-rdd_scatter +  
- geom_vline(xintercept = 300 + c(-cont_ik_bw, cont_ik_bw)) \# add lines to indicate the bandwidth
+`rdd_scatter +
+  geom_vline(xintercept = 300 + c(-cont_ik_bw, cont_ik_bw)) # add lines to indicate the bandwidth`
 
 ![](media/79d90d77e4bd36c9bf976bd56ef4425a.png)
 
@@ -740,24 +763,24 @@ The use of a bandwidth impacts the type of causal estimand we can calculate in a
 
 To estimate the LATE in RDD, a regression model that allows for different slopes on each side of the cutpoint is fit. The regression model is then used to get a predicted value of the outcome variable for each treatment group at the cutpoint. The difference between the predicted outcome values of the treatment and control groups is an estimate of the LATE.
 
-We can use the RDestimate() function from the rdd package as follows to fit the local linear regression model for the contribution matching data:
+We can use the `RDestimate()` function from the `rdd` package as follows to fit the local linear regression model for the contribution matching data:
 
-cont_rdd \<- RDestimate(  
- formula = contribution \~ size, \#outcome regression model  
- data = cont_data, \#dataset  
- cutpoint = 300, \#cutpoint  
- bw = cont_ik_bw \#bandwidth  
-)
+`cont_rdd <- RDestimate(
+  formula = contribution ~ size, #outcome regression model
+  data = cont_data, #dataset
+  cutpoint = 300, #cutpoint
+  bw = cont_ik_bw #bandwidth
+)`
 
-The RDestimate() function fits the local linear regression model at the provided bandwidth, but also at half of the bandwidth and twice the bandwidth. If the estimate of the LATE is relatively the same across bandwidths, we can be more confident that the estimate is accurate. We see all three estimates when we print the results.
+The `RDestimate()` function fits the local linear regression model at the provided bandwidth, but also at half of the bandwidth and twice the bandwidth. If the estimate of the LATE is relatively the same across bandwidths, we can be more confident that the estimate is accurate. We see all three estimates when we print the results.
 
-Call:  
-RDestimate(formula = contribution \~ size, data = cont_data,  
-cutpoint = 300, bw = cont_ik_bw)  
-   
-Coefficients:  
- LATE Half-BW Double-BW  
- 90.60 110.67 71.62
+`Call:
+RDestimate(formula = contribution ~ size, data = cont_data,
+cutpoint = 300, bw = cont_ik_bw)
+ 
+Coefficients:
+    LATE    Half-BW  Double-BW
+   90.60     110.67   71.62`
 
 The model output shows us that the LATE is 90.60, meaning that in this dataset, we can conclude that employer-sponsored retirement contribution matching programs led to an increase in average monthly contributions of \$90.60. However, we see that the estimate changes based on the bandwidth, ranging from \$110.67 at half of the bandwidth to \$71.62 at twice the bandwidth.
 
@@ -774,25 +797,25 @@ However, there are several drawbacks to RDD inherent to the method:
 -   Smaller bandwidths make RDD assumptions more plausible BUT also reduce the sample size.
 -   The local average treatment effect (LATE) is not an easily interpretable estimand. We calculated the effect of the contribution matching program only among the companies with close to 300 employees. How confident can we be that this effect would be the same in much smaller or larger companies?
 
-Let’s explore the tradeoffs with an example. Say we run RDestimate() on the contribution data again, but set the bandwidth to 100 instead of the IK optimal bandwidth of 13. We save the results to rdd_100 and print the output:
+Let’s explore the tradeoffs with an example. Say we run `RDestimate()` on the contribution data again, but set the bandwidth to 100 instead of the IK optimal bandwidth of 13. We save the results to `rdd_100` and print the output:
 
-Call:  
-RDestimate(formula = contribution \~ size, data = cont_data,  
-cutpoint = 300, bw = 100)  
-   
-Coefficients:  
- LATE Half-BW Double-BW  
- 56.71 59.90 53.54
+`Call:
+RDestimate(formula = contribution ~ size, data = cont_data,
+cutpoint = 300, bw = 100)
+ 
+Coefficients:
+    LATE    Half-BW  Double-BW
+   56.71      59.90      53.54`
 
 We can also get information on the number of observations included and the standard error of the LATE for each bandwidth with the code that follows.
 
-rdd_100\$obs \#number of observations  
-\# Output  
-[1] 113 68 178  
-   
-rdd_100\$se \#standard errors  
-\# Output  
-[1] 6.647 9.077 5.269
+`rdd_100$obs #number of observations
+# Output
+[1] 113  68 178
+ 
+rdd_100$se #standard errors
+# Output
+[1] 6.647 9.077 5.269`
 
 Let’s consider just the half-bandwidth (50) and the double-bandwidth (200). Using the half-bandwidth, we analyze only companies with 250-350 employees, so we may believe these companies are very similar to one another. But this leaves only 68 companies in our sample and a standard error of 9.077 for the LATE. We may ask:
 
@@ -833,9 +856,9 @@ To encourage this, the city allows individuals to discontinue curbside recycling
 
 The city compiles the following variables in a dataset to evaluate the success of the rebate program:
 
-recycled: amount recycled (kg/person).  
-rebate: participation in rebate program (curbside vs. rebate).  
-distance: distance from recycling center (5 miles vs. \> 5 miles). An individual who lives less than five miles from a recycling center might be more likely to opt into the rebate program than someone who lives more than five miles from a center. However, distance to a recycling center should not directly impact the amount of waste each person recycles.
+`recycled`: amount recycled (kg/person).  
+`rebate`: participation in rebate program (curbside vs. rebate).  
+`distance`: distance from recycling center (5 miles vs. \> 5 miles). An individual who lives less than five miles from a recycling center might be more likely to opt into the rebate program than someone who lives more than five miles from a center. However, distance to a recycling center should not directly impact the amount of waste each person recycles.
 
 We are going to use Instrumental Variables to answer the city’s question, but before we dive into that, we need to establish some more tools.
 
@@ -943,18 +966,18 @@ In a standard ordinary least squares (OLS) regression model, the outcome is pred
 
 In OLS regression, we would use β1 as an estimate of the treatment effect. To fit the OLS regression model using the recycling data, we would use the following code:
 
-lm(recycled \~ rebate, \#outcome \~ treatment  
- data = recycle_df \#dataset  
-)  
-   
-\# Output:  
-   
-Call:  
-lm(formula = recycled \~ rebate, data = recycle_df)  
-   
-Coefficients:  
-(Intercept) rebate  
- 126.00 38.04
+`lm(recycled ~ rebate, #outcome ~ treatment
+   data = recycle_df #dataset
+)
+ 
+# Output:
+ 
+Call:
+lm(formula = recycled ~ rebate, data = recycle_df)
+ 
+Coefficients:
+(Intercept)   rebate
+  126.00       38.04`
 
 The OLS estimate suggests that participation in the rebate program leads to an average increase in recycling of 38.04 kilograms/person. However, this estimate is biased because OLS regression does not control bias introduced by unmeasured confounding variables or imperfect compliance.
 
@@ -974,31 +997,31 @@ In this lesson, we focus on 2SLS regression with a continuous outcome, binary in
 
 ## IV Estimation in R
 
-Performing 2SLS in R is easy if we use the ivreg() function from the AER package.
+Performing 2SLS in R is easy if we use the `ivreg()` function from the `AER` package.
 
-The key difference in syntax between ivreg() and other regression functions is that the formula argument of the ivreg() function must include the instrument. If we wanted to perform 2SLS regression with variables outcome as the outcome, treatment as the treatment, and instrument as the instrument, the model formula would be outcome \~ treatment \| instrument.
+The key difference in syntax between `ivreg()` and other regression functions is that the `formula` argument of the `ivreg()` function must include the instrument. If we wanted to perform 2SLS regression with variables `outcome` as the outcome, `treatment` as the treatment, and `instrument` as the instrument, the model formula would be `outcome ~ treatment | instrument`.
 
 To fit the 2SLS regression using the recycling data, we would use the following code:
 
-\# import library  
-library(AER)  
-   
-\# run 2SLS regression  
-iv_mod \<- ivreg(  
- \#outcome \~ treatment \| instrument  
- formula = recycled \~ rebate \| distance,   
- data = recycle_df  
- )
+`# import library
+library(AER)
+ 
+# run 2SLS regression
+iv_mod <- ivreg(
+  #outcome ~ treatment | instrument
+  formula = recycled ~ rebate | distance, 
+  data = recycle_df
+  )`
 
-To view the coefficients and standard errors, we can use summary(iv_mod)\$coefficients, which gives the following output:
+To view the coefficients and standard errors, we can use `summary(iv_mod)$coefficients`, which gives the following output:
 
-Estimate Std. Error t value Pr(\>\|t\|)  
-(Intercept) 129.36463 0.8683141 148.98368 0.000000e+00  
-rebate 31.25452 1.4629239 21.36442 5.118885e-68
+`             Estimate Std. Error   t value     Pr(>|t|)
+(Intercept) 129.36463  0.8683141 148.98368 0.000000e+00
+rebate       31.25452  1.4629239  21.36442 5.118885e-68`
 
 The results of 2SLS regression show that the estimate of the effect of the rebate program is 31.25, meaning participation in the rebate program led to an average increase in recycling of 31.25 kilograms/person. This only applies to compliers: those individuals who participated in the rebate program because they lived within 5 miles of a recycling center, but who would not have participated otherwise.
 
-You may be wondering why we couldn’t just fit the two separate regression models described in the previous exercise using lm() or glm() functions. The ivreg() function is preferred because it automatically corrects standard errors to account for the fact that the second stage regression model uses predicted values of the treatment.
+You may be wondering why we couldn’t just fit the two separate regression models described in the previous exercise using `lm()` or `glm()` functions. The `ivreg()` function is preferred because it automatically corrects standard errors to account for the fact that the second stage regression model uses predicted values of the treatment.
 
 If we use incorrect standard errors, we could make incorrect conclusions about the treatment effect:
 
@@ -1011,20 +1034,20 @@ While IV estimation can be effective in certain circumstances, it also has limit
 
 Another limitation is that it is difficult to find a suitable instrument that has a strong relationship with the treatment. If an instrument is only weakly related to the treatment, 2SLS regression will produce inaccurate estimates of the CACE.
 
-To illustrate this, suppose that instead of using distance as an instrument for participation in the rebate program, we used another variable, children. The variable indicates whether or not an individual has children. Having children wouldn’t directly cause a change in recycling, but individuals with children might be less likely to participate in the rebate program. The rebate program requires individuals to take the time to drop off recycling — time that people with children might not have.
+To illustrate this, suppose that instead of using distance as an instrument for participation in the rebate program, we used another variable, `children`. The variable indicates whether or not an individual has children. Having children wouldn’t directly cause a change in recycling, but individuals with children might be less likely to participate in the rebate program. The rebate program requires individuals to take the time to drop off recycling — time that people with children might not have.
 
-Performing the 2SLS regression again with the ivreg() function and the children variable as an instrument highlights the effect of using a weak instrument:
+Performing the 2SLS regression again with the `ivreg()` function and the `children` variable as an instrument highlights the effect of using a weak instrument:
 
-iv_mod_weak \<- ivreg(  
- formula = recycled \~ rebate \| children, \#new weak instrument  
- data = recycle_df  
- )
+`iv_mod_weak <- ivreg(
+  formula = recycled ~ rebate | children, #new weak instrument
+  data = recycle_df
+  )`
 
-Using summary(iv_mod_weak)\$coefficients we can view just the coefficient table from the results summary.
+Using `summary(iv_mod_weak)$coefficients` we can view just the coefficient table from the results summary.
 
-Estimate Std. Error t value Pr(\>\|t\|)  
-(Intercept) 126.10140 8.930242 14.120715 5.477652e-37  
-rebate 37.84692 18.018181 2.100485 3.631487e-02
+`             Estimate Std. Error   t value     Pr(>|t|)
+(Intercept) 126.10140   8.930242 14.120715 5.477652e-37
+rebate       37.84692  18.018181  2.100485 3.631487e-02`
 
 The estimate of 37.85 is neither accurate nor precise, as highlighted by the large standard error. This estimate is similar to the estimate from OLS regression, demonstrating that this is a weak instrument.
 
@@ -1037,7 +1060,7 @@ We covered a lot of topics:
 -   An instrument is a variable that is related to an outcome of interest ONLY through the treatment variable.
 -   The four assumptions of IV estimation are relevance, exclusion, exchangeability, and monotonicity.
 -   IV estimation is performed via two-stage least squares (2SLS) regression.
--   The ivreg() function in the AER package performs 2SLS regression and automatically provides corrected standard errors of the treatment effect.
+-   The `ivreg()` function in the `AER` package performs 2SLS regression and automatically provides corrected standard errors of the treatment effect.
 
 Great job! The 2SLS regression model using the email campaign as an instrument produced a CACE estimate of 38.056. As long as our assumptions hold, this means that using video streaming services increased spending by an average of about 38 dollars. Since this is the CACE, it only applies to compliers: those who used the streaming services because they received the email, but who would not have used streaming otherwise.
 
@@ -1066,33 +1089,33 @@ Difference in differences (DID) is a causal inference technique that estimates a
 
 ## Working Example
 
-Let’s say we have some data on student wages at the state level in a dataset called wages. It has the following variables:
+Let’s say we have some data on student wages at the state level in a dataset called `wages`. It has the following variables:
 
--   state: state where the universities are located
--   year: year the data is from
--   avg_wage: average student wage for all public universities in the state
+-   `state`: state where the universities are located
+-   `year`: year the data is from
+-   `avg_wage`: average student wage for all public universities in the state
 
-Start by using the package ggplot2 in R to re-create the student wage line plot from the last exercise. Since we only want to plot California schools, filter by the state variable and then add code for our plot.
+Start by using the package ggplot2 in R to re-create the student wage line plot from the last exercise. Since we only want to plot California schools, filter by the `state` variable and then add code for our plot.
 
-\# import libraries  
-library(dplyr)  
-library(ggplot2)  
-\# plot wages versus years  
-ca_wages \<- wages %\>%  
- \#only California schools  
- filter(state == "California") %\>%   
- \#wages over time  
- ggplot(aes(x = year, y = avg_wage)) +   
- \#line plot  
- geom_line()
+`# import libraries
+library(dplyr)
+library(ggplot2)
+# plot wages versus years
+ca_wages <- wages %>%
+  #only California schools
+  filter(state == "California") %>% 
+  #wages over time
+  ggplot(aes(x = year, y = avg_wage)) + 
+  #line plot
+  geom_line()`
 
 The situation created by the law is a *natural experiment*. Rather than having a researcher randomly assign treatment and control groups to study minimum wage effects, treatment assignment is decided by some outside force. In this case, that outside force was the minimum wage law that went into effect in 2017.
 
 Let’s add a dashed vertical line to our plot to separate the time before and after the law went into effect. We’ll also label the x-axis scale to see the years more clearly.
 
-ca_wages +  
- geom_vline(xintercept = 2016, linetype = "dashed") +  
- scale_x_continuous(breaks = c(2007:2017))
+`ca_wages +
+  geom_vline(xintercept = 2016, linetype = "dashed") +
+  scale_x_continuous(breaks = c(2007:2017))`
 
 ![CA wage plot](media/f68fa75673d5ef19a50903c02a4b59ea.png)
 
@@ -1104,15 +1127,15 @@ It is impossible to know what truly would have happened in California schools if
 
 In this example, a control trend might be the average student wage of universities in Washington, given that Washington did not implement a new minimum wage law. We can view these two groups in a single plot using the following code:
 
-\# import library  
-library(ggplot2)  
-\# plot wages versus years by state  
-ggplot(data = wages, aes(x = year, y = avg_wage, color = state, linetype = state)) +  
- geom_line() +  
- \#vertical line at 2016  
- geom_vline(xintercept = 2016, linetype = "dashed") +  
- \#x-axis scale 2007 to 2017  
- scale_x_continuous(breaks = c(2007:2017))
+`# import library
+library(ggplot2)
+# plot wages versus years by state
+ggplot(data = wages, aes(x = year, y = avg_wage, color = state, linetype = state)) +
+  geom_line() +
+  #vertical line at 2016
+  geom_vline(xintercept = 2016, linetype = "dashed") +
+  #x-axis scale 2007 to 2017
+  scale_x_continuous(breaks = c(2007:2017))`
 
 ![plot of Average Student Wages vs. Year with two states](media/6e1359fddf5fdacd9a082059ab585c57.png)
 
@@ -1156,19 +1179,19 @@ One way we can estimate the ATT is by comparing the differences in average wages
 
 Let’s view the mean wages for both states for 2016 and 2017 only.
 
-\# import library  
-library(dplyr)  
-\# filter data  
-wages %\>%   
- filter(year \> 2015) \#only 2016 and 2017
+`# import library
+library(dplyr)
+# filter data
+wages %>% 
+  filter(year > 2015) #only 2016 and 2017`
 
 The output looks like the following:
 
-state year avg_wage  
-1 California 2016 13.311279  
-2 California 2017 16.000000  
-3 Washington 2016 9.728146  
-4 Washington 2017 10.000000
+`       state year  avg_wage
+1 California 2016 13.311279
+2 California 2017 16.000000
+3 Washington 2016  9.728146
+4 Washington 2017 10.000000`
 
 First, let’s use the means in our output to take the difference in average wages before and after the law for each state.
 
@@ -1196,44 +1219,44 @@ According to our basic 2x2 DID that uses mean differences alone, we estimate the
 
 While we were able to estimate the ATT through mean differences alone, we can also use linear regression for DID. A simple DID regression model predicts the outcome from the variables for treatment group and time, along with the interaction of treatment with time.
 
-To simplify our output, we will first transform the state variable to a treatment indicator called treat (1 for California and 0 for Washington). Then we transform year to a time indicator called time (1 for 2017 and 0 for 2016).
+To simplify our output, we will first transform the `state` variable to a treatment indicator called `treat` (1 for California and 0 for Washington). Then we transform `year` to a time indicator called `time` (1 for 2017 and 0 for 2016).
 
-\# transform state to treat  
-wages2\$treat \<- ifelse(wages2\$state=="California",1,0)  
-\# transform year to time  
-wages2\$time \<- ifelse(wages2\$year==2017,1,0)
+`# transform state to treat
+wages2$treat <- ifelse(wages2$state=="California",1,0)
+# transform year to time
+wages2$time <- ifelse(wages2$year==2017,1,0)`
 
 We can print and inspect our dataset to make sure our transformations were done correctly.
 
-state treat year time avg_wage  
-1 California 1 2016 0 13.311279  
-2 California 1 2017 1 16.000000  
-3 Washington 0 2016 0 9.728146  
-4 Washington 0 2017 1 10.000000
+`       state treat year time  avg_wage
+1 California     1 2016    0 13.311279
+2 California     1 2017    1 16.000000
+3 Washington     0 2016    0  9.728146
+4 Washington     0 2017    1 10.000000`
 
-To create a DID regression for our student wage data, we run a model that predicts average student wages from the treatment, time, and the interaction of treatment and time. Note that in R, treat\*time is equivalent to treat + time + treat:time.
+To create a DID regression for our student wage data, we run a model that predicts average student wages from the treatment, time, and the interaction of treatment and time. Note that in R, `treat*time` is equivalent to `treat + time + treat:time`.
 
-did_mod \<- lm(  
- \#include interaction  
- avg_wage \~ treat\*year,  
- \#use subsetted data   
- data = wages2   
-)
+`did_mod <- lm(
+  #include interaction
+  avg_wage ~ treat*year,
+  #use subsetted data 
+  data = wages2 
+)`
 
-When we print did_mod we get the following output. Note that the coefficient on the interaction term treat:year is exactly what we computed for the ATT by taking the difference of means. We estimate the impact of the minimum wage law on California student wages to be an increase of about \$2.42.
+When we print `did_mod` we get the following output. Note that the coefficient on the interaction term `treat:year` is exactly what we computed for the ATT by taking the difference of means. We estimate the impact of the minimum wage law on California student wages to be an increase of about \$2.42.
 
-Call:  
-lm(formula = avg_wage \~ treat \* time, data = wages2)  
-   
-Coefficients:  
-(Intercept) treat time treat:time   
- 9.7281 3.5831 0.2719 2.4169
+`Call:
+lm(formula = avg_wage ~ treat * time, data = wages2)
+ 
+Coefficients:
+(Intercept)        treat         time   treat:time  
+     9.7281       3.5831       0.2719       2.4169`
 
 What do all the other coefficients represent?
 
--   Intercept indicates the expected value for pre-treatment average student wages for the control group (Washington 2016).
--   treat is the difference between the control group and the treatment group at the pre-treatment time (California 2016 - Washington 2016).
--   time is the difference between the pre-treatment and post-treatment times for the control group (Washington 2017 - Washington 2016).
+-   `Intercept` indicates the expected value for pre-treatment average student wages for the control group (Washington 2016).
+-   `treat` is the difference between the control group and the treatment group at the pre-treatment time (California 2016 - Washington 2016).
+-   `time` is the difference between the pre-treatment and post-treatment times for the control group (Washington 2017 - Washington 2016).
 
 Combinations of these coefficients give us back all four means from our dataset.
 
